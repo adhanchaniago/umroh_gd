@@ -1,0 +1,33 @@
+@import "compass/css3";
+.thin-progress-bar {
+  @include transition(all 1s linear);
+  width: 0;
+  height: 3px;
+  background: #ba1e3d;
+  @include box-shadow(2px 0 3px #888);
+}
+
+div {
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+.btn {
+  @include box-shadow(0 1px 1px #874);
+  color: #331;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  @include text-shadow(0 1px 0 #bbb);
+  display: inline;
+  padding: 0.6em 2em;
+  border: 1px #761 solid;
+  @include background(linear-gradient(top, #da5, #981));
+  @include border-radius(4px);
+  &:hover {
+    @include background(linear-gradient(top, lighten(#da5, 10%), lighten(#981, 10%)));
+  }
+  &:active {
+    @include background(linear-gradient(bottom, #da5, #981));
+  }
+}

@@ -1,0 +1,23 @@
+.container input#username {
+background: #0c38fd url('http://i.imgur.com/u0XmBmv.png') 20px top no-repeat;
+background-size: 16px 80px;
+
+}
+
+.container input#username:focus {
+background: #0c38fd url('http://i.imgur.com/u0XmBmv.png') 20px bottom no-repeat;
+background-size: 16px 80px;
+}
+
+.container input#password {
+background: #0c38fd url('http://i.imgur.com/Qf83FTt.png') 20px top no-repeat;
+background-size: 16px 80px;
+}
+
+.container  input#password:focus {
+background: #0c38fd url('http://i.imgur.com/Qf83FTt.png') 20px bottom no-repeat;
+background-size: 16px 80px;
+}
+form input:focus {
+  width :250px;
+}

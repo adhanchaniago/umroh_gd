@@ -1,0 +1,43 @@
+div {
+    position:relative;
+    margin:0px;
+    width:220px; height:220px;
+}
+
+.canvas {
+    display: block;
+    position:absolute;
+    top:0;
+    left:0;
+}
+.span0 {
+    color:#FFFFFF;
+    display:block;
+    line-height:90px;
+    text-align:center;
+    width:100px;
+    font-family:sans-serif;
+    font-size:40px;
+    font-weight:100;
+    margin-left:0px;
+}
+.span1 {
+    color:#FFFFFF;
+    display:block;
+    line-height:0px;
+    text-align:center;
+    width:100px;
+    font-family:sans-serif;
+    font-size:12px;
+    font-weight:100;
+    margin-top:-15px;
+    margin-left:0px;
+}
+
+input {
+    width: 200px;
+}
+
+span {
+  
+}

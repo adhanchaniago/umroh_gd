@@ -1,0 +1,259 @@
+#Total New User Today:
+SELECT 'Today' as Period, COALESCE(COUNT(DISTINCT pass),0) as TNU FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() AND pass not in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE())
+
+#Total User Today:
+SELECT 'Today' as Period, COALESCE(COUNT(DISTINCT pass),0) as TAU FROM `radpostauth` 
+where date(`authdate`) = CURDATE()
+
+#Total New User 7Days:
+SELECT 'Last7Days' as Period, COALESCE(COUNT(DISTINCT pass),0) as 7DNU FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() - INTERVAL 1 week AND pass not in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE() - INTERVAL 1 week)
+
+#Total User 7Days:
+SELECT 'Last7Days' as Period, COALESCE(COUNT(DISTINCT pass),0) as 7DAU FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() - INTERVAL 1 Week
+
+#Total New User 30Days:
+SELECT 'Last30Days' as Period, COALESCE(COUNT(DISTINCT pass),0) as 30DNU FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() - INTERVAL 1 month AND pass not in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE() - INTERVAL 1 month)
+
+#Total User 30Days:
+SELECT 'Last30Days' as Period, COALESCE(COUNT(DISTINCT pass),0) as 30AU FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() - INTERVAL 1 month
+
+#Margin New User Today:
+SELECT A.Period, round(COALESCE((A.TNU / B.TAU),0) * 100 - COALESCE((C.YNU / D.YAU) *100,0),0) as Margin
+from
+(SELECT 'Today' as Period, COALESCE(COUNT(DISTINCT pass),0) as TNU FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() AND pass not in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE())) A
+left JOIN
+(SELECT 'Today' as Period, COALESCE(COUNT(DISTINCT pass),0) as TAU FROM `radpostauth` 
+where date(`authdate`) = CURDATE()) B
+on A.Period = B.Period
+Left JOIN
+(SELECT 'Today' as Period, COALESCE(COUNT(DISTINCT pass),0) as YNU FROM `radpostauth` 
+where date(`authdate`) = CURDATE() - INTERVAL 1 day AND pass not in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE() - INTERVAL 1 day)) C
+on A.Period = C.Period
+left JOIN
+(SELECT 'Today' as Period, COALESCE(COUNT(DISTINCT pass),0) as YAU FROM `radpostauth` 
+where date(`authdate`) = CURDATE() - INTERVAL 1 day) D
+on A.Period = D.Period
+
+
+#Margin New User Last7Days:
+SELECT A.Period, round(COALESCE((A.7DNU / B.7DAU),0) * 100 - COALESCE((C.2WNU / D.2WAU) * 100,0),0) as Margin
+from
+(SELECT 'Last7Days' as Period, COALESCE(COUNT(DISTINCT pass),0) as 7DNU FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() - INTERVAL 1 week AND pass not in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE() - INTERVAL 1 week)) A
+left JOIN
+(SELECT 'Last7Days' as Period, COALESCE(COUNT(DISTINCT pass),0) as 7DAU FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() - INTERVAL 1 Week) B
+on A.Period = B.Period
+Left JOIN
+(SELECT 'Last7Days' as Period, COALESCE(COUNT(DISTINCT pass),0) as 2WNU FROM `radpostauth` 
+where date(`authdate`) BETWEEN CURDATE() - INTERVAL 2 Week AND CURDATE() - INTERVAL 1 Week AND pass not in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE() - INTERVAL 2 Week)) C
+on A.Period = C.Period
+left JOIN
+(SELECT 'Last7Days' as Period, COALESCE(COUNT(DISTINCT pass),0) as 2WAU FROM `radpostauth` 
+where date(`authdate`) BETWEEN CURDATE() - INTERVAL 2 Week AND CURDATE() - INTERVAL 1 Week) D
+on A.Period = D.Period
+
+#Margin New User Last30Days:
+SELECT A.Period, round(COALESCE((A.30DNU / B.30AU),0) * 100 - COALESCE((C.2MNU / D.2MAU) * 100,0),0) as Margin
+from
+(SELECT 'Last30Days' as Period, COALESCE(COUNT(DISTINCT pass),0) as 30DNU FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() - INTERVAL 1 month AND pass not in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE() - INTERVAL 1 month)) A
+left JOIN
+(SELECT 'Last30Days' as Period, COALESCE(COUNT(DISTINCT pass),0) as 30AU FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() - INTERVAL 1 month) B
+on A.Period = B.Period
+Left JOIN
+(SELECT 'Last30Days' as Period, COALESCE(COUNT(DISTINCT pass),0) as 2MNU FROM `radpostauth` 
+where date(`authdate`) BETWEEN CURDATE() - INTERVAL 2 MONTH AND CURDATE() - INTERVAL 1 MONTH AND pass not in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE() - INTERVAL 2 MONTH)) C
+on A.Period = C.Period
+left JOIN
+(SELECT 'Last30Days' as Period, COALESCE(COUNT(DISTINCT pass),0) as 2MAU FROM `radpostauth` 
+where date(`authdate`) BETWEEN CURDATE() - INTERVAL 2 MONTH AND CURDATE() - INTERVAL 1 MONTH) D
+on A.Period = D.Period
+
+#Login type
+SELECT  'Today' as Period, 'Room Login' as 'Category', count(`pass`) as 'Count' from radpostauth where  date(`authdate`) >= CURDATE()
+and `username` not in (SELECT `emailAddress` FROM `reg_users` WHERE date(`regDate`) >= CURDATE())
+group by Period, Category
+union ALL
+SELECT  'Today' as Period, 'Form Registration' as 'Category', count(`pass`) as 'Count' from radpostauth where  date(`authdate`) >= CURDATE()
+and `username` in (SELECT `emailAddress` FROM `reg_users` WHERE date(`regDate`) >= CURDATE())
+group by Period, Category
+union ALL
+SELECT  'Last7Days' as Period, 'Room Login' as 'Category', count(`pass`) as 'Count' from radpostauth where  date(`authdate`) >= CURDATE() - INTERVAL 1 Week
+and `username` not in (SELECT `emailAddress` FROM `reg_users` WHERE date(`regDate`) >= CURDATE() - INTERVAL 1 Week)
+group by Period, Category
+union ALL
+SELECT  'Last7Days' as Period, 'Form Registration' as 'Category', count(`pass`) as 'Count' from radpostauth where  date(`authdate`) >= CURDATE() - INTERVAL 1 Week
+and `username` in (SELECT `emailAddress` FROM `reg_users` WHERE date(`regDate`) >= CURDATE() - INTERVAL 1 Week)
+group by Period, Category
+union ALL
+SELECT 'Last30Days' as Period, 'Room Login' as 'Category', count(`pass`) as 'Count' from radpostauth where  date(`authdate`) >= CURDATE() - INTERVAL 1 month
+and `username` not in (SELECT `emailAddress` FROM `reg_users` WHERE date(`regDate`) >= CURDATE() - INTERVAL 1 month)
+group by Period, Category
+union ALL
+SELECT 'Last30Days' as Period, 'Form Registration' as 'Category', count(`pass`) as 'Count' from radpostauth where  date(`authdate`) >= CURDATE() - INTERVAL 1 month
+and `username` in (SELECT `emailAddress` FROM `reg_users` WHERE date(`regDate`) >= CURDATE() - INTERVAL 1 month)
+group by Period, Category
+
+
+#Line Chart Today
+SELECT A.Serial, COALESCE(B.New,0) as 'New', COALESCE(C.Returning,0) as 'Returning' FROM
+(SELECT CURDATE() + INTERVAL a + b Hour 'Serial'
+FROM
+ (SELECT 0 a UNION SELECT 1 a UNION SELECT 2 UNION SELECT 3
+    UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7
+    UNION SELECT 8 UNION SELECT 9 ) d,
+ (SELECT 0 b UNION SELECT 10 UNION SELECT 20 
+    UNION SELECT 30 UNION SELECT 40) m
+WHERE CURDATE() + INTERVAL a + b hour  <=  NOW()
+ORDER BY a + b)A
+LEFT JOIN
+(SELECT `authdate`, COALESCE(COUNT(DISTINCT pass),0) as 'New' FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() AND pass not in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE()))B
+ON A.Serial = B.`authdate`
+LEFT JOIN
+(SELECT `authdate`, COALESCE(COUNT(DISTINCT pass),0) as 'Returning' FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() AND pass in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE()))C
+ON A.Serial = C.`authdate`
+ORDER BY A.Serial ASC
+
+#Line Chart last 7 days 
+select A.Serial, COALESCE(B.New,0) as 'New', COALESCE(C.Returning,0) as 'Returning' from
+(SELECT CURDATE() - INTERVAL 1 Week + INTERVAL a + b DAY 'Serial'
+FROM
+ (SELECT 0 a UNION SELECT 1 a UNION SELECT 2 UNION SELECT 3
+    UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7
+    UNION SELECT 8 UNION SELECT 9 ) d,
+ (SELECT 0 b UNION SELECT 10 UNION SELECT 20 
+    UNION SELECT 30 UNION SELECT 40) m
+WHERE CURDATE() - INTERVAL 1 Week + INTERVAL a + b DAY  <=  CURDATE()
+ORDER BY a + b) A
+LEFT JOIN
+(SELECT  `authdate`, COALESCE(COUNT(DISTINCT `pass`),0) as 'New' FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() - INTERVAL 1 week AND pass not in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE() - INTERVAL 1 week))B
+on A.Serial = date(B.`authdate`)
+LEFT JOIN
+(SELECT  `authdate`, COALESCE(COUNT(DISTINCT `pass`),0) as 'Returning' FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() - INTERVAL 1 week AND pass in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE() - INTERVAL 1 week))C
+on A.Serial = date(C.`authdate`)
+ORDER BY A.Serial ASC
+
+#Line Chart last 30 days
+select A.Serial, COALESCE(B.New,0) as 'New', COALESCE(C.Returning,0) as 'Returning' from
+(SELECT CURDATE() - INTERVAL 1 Month + INTERVAL a + b DAY 'Serial'
+FROM
+ (SELECT 0 a UNION SELECT 1 a UNION SELECT 2 UNION SELECT 3
+    UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7
+    UNION SELECT 8 UNION SELECT 9 ) d,
+ (SELECT 0 b UNION SELECT 10 UNION SELECT 20 
+    UNION SELECT 30 UNION SELECT 40) m
+WHERE CURDATE() - INTERVAL 1 Month + INTERVAL a + b DAY  <=  CURDATE()
+ORDER BY a + b) A
+LEFT JOIN
+(SELECT  `authdate`, COALESCE(COUNT(DISTINCT `pass`),0) as 'New' FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() - INTERVAL 1 month AND pass not in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE() - INTERVAL 1 month))B
+on A.Serial = date(B.`authdate`)
+LEFT JOIN
+(SELECT  `authdate`, COALESCE(COUNT(DISTINCT `pass`),0) as 'Returning' FROM `radpostauth` 
+where date(`authdate`) >= CURDATE() - INTERVAL 1 month AND pass in (SELECT DISTINCT pass FROM `radpostauth` where date(`authdate`) < CURDATE() - INTERVAL 1 month))C
+on A.Serial = date(C.`authdate`)
+ORDER BY A.Serial ASC
+
+#Nanti
+Select A.Period, A.NewDevice, B.TotalDevice
+from
+(
+/* Today new device */
+SELECT 'Today' as 'Period'
+      ,count( distinct [MAC]) as 'NewDevice'
+	FROM [ITOperation_DB].[dbo].[PortalAuth]
+	where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) = CONVERT(date, getdate())
+		AND [Status] = 'USER LOGIN' and [MAC] not in (select distinct [MAC] FROM [ITOperation_DB].[dbo].[PortalAuth] where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) < CONVERT(date, getdate()))
+Union all
+/* Yesterday new device */
+SELECT 'Yesterday' as 'Period'
+      ,count( distinct [MAC]) as 'NewDevice'
+	FROM [ITOperation_DB].[dbo].[PortalAuth]
+	where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) = DATEADD(day, -1, CONVERT(date, getdate()))
+		AND [Status] = 'USER LOGIN' AND [MAC] not in (select distinct [MAC] FROM [ITOperation_DB].[dbo].[PortalAuth] where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) < DATEADD(day, -1, CONVERT(date, getdate())))
+Union all
+/* Last 7 days new device */
+SELECT 'Last 7 days' as 'Period'
+      ,count( distinct [MAC]) as 'NewDevice'
+	FROM [ITOperation_DB].[dbo].[PortalAuth]
+	where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) >= DATEADD(week, -1, CONVERT(date, getdate()))
+		AND [Status] = 'USER LOGIN' AND [MAC] not in (select distinct [MAC] FROM [ITOperation_DB].[dbo].[PortalAuth] where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) < DATEADD(week, -1, CONVERT(date, getdate())))
+Union all
+/* 7-14 new device */
+SELECT '7-14' as 'Period'
+      ,count( distinct [MAC]) as 'NewDevice'
+	FROM [ITOperation_DB].[dbo].[PortalAuth]
+	where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) between DATEADD(week, -1, CONVERT(date, getdate())) and DATEADD(week, -2, CONVERT(date, getdate()))
+		AND [Status] = 'USER LOGIN' AND [MAC] not in (select distinct [MAC] FROM [ITOperation_DB].[dbo].[PortalAuth] where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) < DATEADD(week, -2, CONVERT(date, getdate())))
+Union all
+/* Last 30 days all device */
+SELECT 'Last 30 days' as 'Period'
+      ,count( distinct [MAC]) as 'TotalDevice'
+	FROM [ITOperation_DB].[dbo].[PortalAuth]
+	where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) >= DATEADD(month, -1, CONVERT(date, getdate()))
+		AND [Status] = 'USER LOGIN' AND [MAC] not in (select distinct [MAC] FROM [ITOperation_DB].[dbo].[PortalAuth] where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) < DATEADD(month, -1, CONVERT(date, getdate())))
+Union all
+/* 30-60 all device */
+SELECT '30-60' as 'Period'
+      ,count( distinct [MAC]) as 'TotalDevice'
+	FROM [ITOperation_DB].[dbo].[PortalAuth]
+	where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) between DATEADD(month, -1, CONVERT(date, getdate())) and DATEADD(month, -2, CONVERT(date, getdate()))
+		AND [Status] = 'USER LOGIN' AND [MAC] not in (select distinct [MAC] FROM [ITOperation_DB].[dbo].[PortalAuth] where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) < DATEADD(month, -2, CONVERT(date, getdate())))
+)A
+left join 
+(
+/* Today new device */
+SELECT 'Today' as 'Period'
+      ,count( distinct [MAC]) as 'TotalDevice'
+	FROM [ITOperation_DB].[dbo].[PortalAuth]
+	where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) = CONVERT(date, getdate())
+		AND [Status] = 'USER LOGIN'
+Union all
+/* Yesterday all device */
+SELECT 'Yesterday' as 'Period'
+      ,count( distinct [MAC]) as 'TotalDevice'
+	FROM [ITOperation_DB].[dbo].[PortalAuth]
+	where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) = DATEADD(day, -1, CONVERT(date, getdate()))
+		AND [Status] = 'USER LOGIN'
+Union all
+/* Last 7 days all device */
+SELECT 'Last 7 days' as 'Period'
+      ,count( distinct [MAC]) as 'TotalDevice'
+	FROM [ITOperation_DB].[dbo].[PortalAuth]
+	where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) >= DATEADD(week, -1, CONVERT(date, getdate()))
+		AND [Status] = 'USER LOGIN'
+Union all
+/* 7-14 all device */
+SELECT '7-14' as 'Period'
+      ,count( distinct [MAC]) as 'TotalDevice'
+	FROM [ITOperation_DB].[dbo].[PortalAuth]
+	where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) between DATEADD(week, -1, CONVERT(date, getdate())) and DATEADD(week, -2, CONVERT(date, getdate()))
+		AND [Status] = 'USER LOGIN'
+Union all
+/* Last 30 days all device */
+SELECT 'Last 30 days' as 'Period'
+      ,count( distinct [MAC]) as 'TotalDevice'
+	FROM [ITOperation_DB].[dbo].[PortalAuth]
+	where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) >= DATEADD(month, -1, CONVERT(date, getdate()))
+		AND [Status] = 'USER LOGIN'
+Union all
+/* 30-60 all device */
+SELECT '30-60' as 'Period'
+      ,count( distinct [MAC]) as 'TotalDevice'
+	FROM [ITOperation_DB].[dbo].[PortalAuth]
+	where [USER] is not NULL and [USER] not in ('unknown') and cast(concat(year(getdate()),' ',[DATE]) as date) between DATEADD(month, -1, CONVERT(date, getdate())) and DATEADD(month, -2, CONVERT(date, getdate()))
+		AND [Status] = 'USER LOGIN'
+)B
+on A.Period = B.Period

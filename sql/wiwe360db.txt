@@ -1,0 +1,76 @@
+CREATE TABLE `wiwe360`.`user` 
+( 
+`UserID` INT(10) NOT NULL
+,`Email` VARCHAR(100) NOT NULL 
+,`Password` VARCHAR(40) NOT NULL
+,`RoleID` INT(10) NOT NULL 
+,`Status` VARCHAR(10)  NOT NULL 
+, `Salutation` VARCHAR(10) NOT NULL
+, `FirstName`VARCHAR(100) NOT NULL 
+, `LastName`VARCHAR(100) NULL
+, `PhotoURL` BLOB NULL
+, `BirthDate` DATE NULL 
+, `Phone`VARCHAR(20) NULL
+, `Gender`VARCHAR(20) NOT NULL
+, `Dummy` INT(2) NOT NULL
+, `CreatedDate` timestamp DEFAULT CURRENT_TIMESTAMP
+, `Lastlogin` datetime NULL
+);
+
+ALTER TABLE `user` ADD PRIMARY KEY(`UserID`);
+ALTER TABLE `user` ADD UNIQUE(`Email`);
+INSERT INTO `user` (`UserID`, `Email`, `Password`, `RoleID`, `Status`, `Salutation`, `FirstName`, `LastName`, `PhotoURL`, `BirthDate`, `Phone`, `Gender`, `Dummy`, `CreatedDate`, `Lastlogin`) VALUES ('1', 'hendrik@global-infotech.co.id', 'WiWE360', '1', 'Active', 'Mr.', 'Admin', NULL, NULL, NULL, NULL, 'Male', '0', CURRENT_TIMESTAMP, NULL);
+INSERT INTO `user` (`UserID`, `Email`, `Password`, `RoleID`, `Status`, `Salutation`, `FirstName`, `LastName`, `PhotoURL`, `BirthDate`, `Phone`, `Gender`, `Dummy`, `CreatedDate`, `Lastlogin`) VALUES ('2','hendrik.idn@gmail.com','3edcVFR$','1','Active','Mr.','Super',NULL,NULL,NULL,NULL,'Male','1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO `user` (`UserID`, `Email`, `Password`, `RoleID`, `Status`, `Salutation`, `FirstName`, `LastName`, `PhotoURL`, `BirthDate`, `Phone`, `Gender`, `Dummy`, `CreatedDate`, `Lastlogin`) VALUES ('3','hendrik.gunawan@global-infotech.co.id','3edcVFR$','2','Active','Mr.','Hendrik','Gunawan',NULL,NULL,NULL,'Male','1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO `user` (`UserID`, `Email`, `Password`, `RoleID`, `Status`, `Salutation`, `FirstName`, `LastName`, `PhotoURL`, `BirthDate`, `Phone`, `Gender`, `Dummy`, `CreatedDate`, `Lastlogin`) VALUES ('4','bambang.wijonarko@global-infotech.co.id','3edcVFR$','3','Active','Mr.','Bambang','Wijonarko',NULL,NULL,NULL,'Male','1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO `user` (`UserID`, `Email`, `Password`, `RoleID`, `Status`, `Salutation`, `FirstName`, `LastName`, `PhotoURL`, `BirthDate`, `Phone`, `Gender`, `Dummy`, `CreatedDate`, `Lastlogin`) VALUES ('5','ristian.akbar@global-infotech.co.id','3edcVFR$','4','Active','Mr.','Ristian','Akbar',NULL,NULL,NULL,'Male','1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO `user` (`UserID`, `Email`, `Password`, `RoleID`, `Status`, `Salutation`, `FirstName`, `LastName`, `PhotoURL`, `BirthDate`, `Phone`, `Gender`, `Dummy`, `CreatedDate`, `Lastlogin`) VALUES ('6','hendrik.gun.a.1@gmail.com','3edcVFR$','5','Inactive','Mrs.','Maria','Tane',NULL,NULL,NULL,'Female','1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+CREATE TABLE `wiwe360`.`service_level` 
+( 
+`hotel_name` VARCHAR(50) NOT NULL 
+,`period` VARCHAR(10) NOT NULL 
+,`service_level` FLOAT NOT NULL 
+);
+
+INSERT INTO `service_level` (`hotel_name`, `period`, `service_level`) VALUES ('Como', 'Today', 99.8598);
+INSERT INTO `service_level` (`hotel_name`, `period`, `service_level`) VALUES ('Como','Yesterday',99.4861);
+INSERT INTO `service_level` (`hotel_name`, `period`, `service_level`) VALUES ('Como','Last7Days',99.5809);
+INSERT INTO `service_level` (`hotel_name`, `period`, `service_level`) VALUES ('Como','7-14',99.6245);
+INSERT INTO `service_level` (`hotel_name`, `period`, `service_level`) VALUES ('Como','Last30Day',99.2748);
+INSERT INTO `service_level` (`hotel_name`, `period`, `service_level`) VALUES ('Como','30-60',99);
+
+
+CREATE TABLE `wiwe360`.`heartbeat_status` 
+( 
+`hotel_name` VARCHAR(50) NOT NULL 
+,`date_time` datetime NOT NULL 
+,`remarks` VARCHAR(10) NOT NULL 
+);
+
+INSERT INTO `heartbeat_status` (`hotel_name`, `date_time`, `remarks`) VALUES ('Como', '2017-01-06 11:00:02', 'online');
+INSERT INTO `heartbeat_status` (`hotel_name`, `date_time`, `remarks`) VALUES ('Como', '2017-01-06 09:44:05', 'offline');
+
+CREATE TABLE `wiwe360`.`License` 
+( 
+`Status` VARCHAR(10) NOT NULL 
+,`LicenseCode` VARCHAR(50) NOT NULL 
+,`PrivateKey` INT(10) NOT NULL 
+,`ExpirationDate` date  NOT NULL 
+, `HotelID` VARCHAR(10) NOT NULL
+, `Module`VARCHAR(10) NOT NULL 
+);
+
+ALTER TABLE `License` ADD PRIMARY KEY(`LicenseCode`);
+
+CREATE TABLE `wiwe360`.`ModuleSelection` 
+( 
+`SelectionID` INT(10) NOT NULL 
+,`LicenseCode` VARCHAR(50) NOT NULL 
+,
+,`ExpirationDate` date  NOT NULL 
+, `HotelID` VARCHAR(10) NOT NULL
+, `Module`VARCHAR(10) NOT NULL 
+);
+
+`SelectionID` INT(2) NOT NULL ,`Module` VARCHAR(10) NOT NULL , `RoleID` INT(2) NOT NULL , `Display`VARCHAR(10) NOT NULL ) ENGINE = InnoDB;
